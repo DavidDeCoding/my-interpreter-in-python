@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+import sys
+from collections import defaultdict
+
+def main():
+    filename = sys.argv[1]
+    try:
+        program = []
+        labels = defaultdict(lambda: -1)
+        with open(filename) as f:
+            pc = 0
+            for line in f.readlines():
+                line = line.strip()
+                line = line.split()
+                
+                if not line:
+                    continue
+
+                opcode = line[0]
+
+                if ":" in opcode:
+                    labels[opcode[:-1]] = pc
+                    continue
+                elif opcode == "PUSH":
+                    program.append(opcode)
+                    program.append(line[1])
+                    pc += 2
+                elif opcode == "POP":
+                    program.append(opcode)
+                    pc += 1
+                elif opcode == "ADD":
+                    program.append(opcode)
+                    pc += 1
+                elif opcode == "SUB":
+                    program.append(opcode)
+                    pc += 1
+                elif opcode == "PRINT":
+                    program.append(opcode)
+                    pc += 1
+                elif opcode == "END":
+                    program.append(opcode)
+                    pc += 1
+                elif opcode == "JUMP.GT":
+                    program.append(opcode)
+                    program.append(int(line[1]))
+                    program.append(line[2])
+                    pc += 3
+                elif opcode == "JUMP.LT":
+                    program.append(opcode)
+                    program.append(int(line[1]))
+                    program.append(line[2])
+                    pc += 3
+                elif opcode == "JUMP.EQ":
+                    program.append(opcode)
+                    program.append(int(line[1]))
+                    program.append(line[2])
+                    pc += 3
+                else:
+                    print(f"Incorrect statement: {line}")
+                    exit(1)
+
+            pc, stack = 0, []
+            while pc < len(program):
+                opcode = program[pc]
+                if opcode == "PUSH":
+                    stack.append(int(program[pc+1]))
+                    pc += 2
+                elif opcode == "POP":
+                    stack.pop()
+                    pc += 1
+                elif opcode == "ADD":
+                    a = stack.pop()
+                    b = stack.pop()
+                    stack.append(a+b)
+                    pc += 1
+                elif opcode == "SUB":
+                    a = stack.pop()
+                    b = stack.pop()
+                    stack.append(b-a)
+                    pc += 1
+                elif opcode == "PRINT":
+                    print(stack[-1])
+                    pc += 1
+                elif opcode == "END":
+                    exit(0)
+                elif opcode == "JUMP.GT":
+                    a = stack.pop()
+                    b = int(program[pc+1])
+                    label = program[pc+2]
+                    if a > b:
+                        pc = labels[label]
+                    else:
+                        pc += 3
+                elif opcode == "JUMP.LT":
+                    a = stack.pop()
+                    b = int(program[pc+1])
+                    label = program[pc+2]
+                    if a < b:
+                        pc = labels[label]
+                    else:
+                        pc += 3
+                elif opcode == "JUMP.EQ":
+                    a = stack.pop()
+                    b = int(program[pc+1])
+                    label = program[pc+2]
+                    if a == b:
+                        pc = labels[label]
+                    else:
+                        pc += 3
+                else:
+                    print(f"Incorrect statement: {line}")
+                    exit(1)
+
+    except FileNotFoundError:
+        print(f"No such file: {filename}")
+
+if __name__ == "__main__":
+    main()

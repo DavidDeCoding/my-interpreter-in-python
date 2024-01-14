@@ -1,0 +1,6 @@
+fn add(x, y) {
+    let results = x + y;
+    results
+}
+
+add(10, 20)
