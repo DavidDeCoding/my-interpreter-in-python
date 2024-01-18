@@ -55,6 +55,14 @@ Here are examples of binary operations:
 { value: "false" }
 ```
 
+**String Addition:**
+```
+> let x = "Hello";
+{ type: "string", value: "Hello" }
+> x = x + ", World!"
+{ type: "string", value: "Hello, World!" }
+```
+
 ## Declare Variable
 We can declare a variable and then reassign it
 **Declare Mutable Variable as a primitive and reassign:**
