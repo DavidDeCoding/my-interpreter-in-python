@@ -45,6 +45,18 @@ class BooleanValue(RuntimeValue):
     def __repr__(self):
         return self.__str__()
 
+class StringValue(RuntimeValue):
+
+    def __init__(self, value):
+        super().__init__("string")
+        self.value = value
+
+    def __str__(self):
+        return "{ " + f'type: "{self.type}", value: "{self.value}"' + " }"
+
+    def __repr__(self):
+        return self.__str__()
+
 class BreakValue(RuntimeValue):
 
     def __init__(self):

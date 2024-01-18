@@ -1,4 +1,4 @@
-from values import NullValue, NumericValue, ObjectValue, NativeFnValue, FunctionValue
+from values import NullValue, NumericValue, StringValue, ObjectValue, NativeFnValue, FunctionValue
 from ast import Statement
 from environment import Environment
 
@@ -128,11 +128,20 @@ def evaluateBinaryExpression(binaryExpressionAstNode, environment):
     if leftHandSide.type == "number" and rightHandSide.type == "number":
         if binaryExpressionAstNode.operator in ["+", "-", "*", "/", "%"]:
             return evaluateNumericBinaryExpression(leftHandSide, rightHandSide, binaryExpressionAstNode.operator, environment)
-        else:
+        elif binaryExpressionAstNode.operator in [">", "<", "==", "!=", "<=", ">="]:
             return evaluateCompareBinaryExpression(leftHandSide, rightHandSide, binaryExpressionAstNode.operator, environment)
-    else:
-        return evaluateLogicalBinaryExpression(leftHandSide, rightHandSide, binaryExpressionAstNode.operator, environment)
-
+        else:
+            raise Exception(f"Invalid operator found for numbers: {binaryExpressionAstNode.operator}")
+    elif leftHandSide.type == "boolean" and rightHandSide.type == "boolean":
+        if binaryExpressionAstNode.operator in ["&&", "||"]:
+            return evaluateLogicalBinaryExpression(leftHandSide, rightHandSide, binaryExpressionAstNode.operator, environment)
+        else:
+            raise Exception(f"Invalid operator found for boolean: {binaryExpressionAstNode.operator}")
+    elif leftHandSide.type == "string" and rightHandSide.type == "string":
+        if binaryExpressionAstNode.operator in ["+"]:
+            return StringValue(leftHandSide.value + rightHandSide.value)
+        else:
+            raise Exception(f"Invalid operator found for string: {binaryExpressionAstNode.operator}")
     return NullValue()
 
 def evaluateIdentifier(identifierAstNode, environment):
@@ -183,6 +192,10 @@ def evaluateCallExpression(callExpressionAstNode, environment):
 def evaluate(astNode, environment):
     if astNode.kind == "NumericLiteral":
         return NumericValue(astNode.value)
+    elif astNode.kind == "BooleanLiteral":
+        return environment.lookupVariable(astNode.value)
+    elif astNode.kind == "StringLiteral":
+        return StringValue(astNode.value)
     elif astNode.kind == "Identifier":
         return evaluateIdentifier(astNode, environment)
     elif astNode.kind == "ObjectLiteral":

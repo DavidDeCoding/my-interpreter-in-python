@@ -1,5 +1,6 @@
-from ast import Statement, ProgramStatement, VariableDeclarationStatement, FunctionDeclarationStatement, IfStatement, WhileStatement, BreakStatement, ContinueStatement, AssignmentExpressionStatement, Expression, ObjectLiteralExpression, PropertyExpression, BinaryExpression, CallExpression, MemberExpression, NumericLiteralExpression, IdentifierExpression
+from ast import Statement, ProgramStatement, VariableDeclarationStatement, FunctionDeclarationStatement, IfStatement, WhileStatement, BreakStatement, ContinueStatement, AssignmentExpressionStatement, Expression, ObjectLiteralExpression, PropertyExpression, BinaryExpression, CallExpression, MemberExpression, NumericLiteralExpression, BooleanLiteralExpression, StringLiteralExpression, IdentifierExpression
 from lexer import tokenize, Token, TokenType
+from typed import NumberType, BooleanType, ObjectType, PropertyType
 
 class Parser:
 
@@ -47,16 +48,23 @@ class Parser:
     def parseVariableDeclaration(self):
         isConstant = self.eat().type == TokenType.Const
         identifier = self.expect(TokenType.Identifier, "Expected identifier.").value
+        
+        typee = None
+        if self.at().type == TokenType.Colon:
+            self.eat()
+            typee = self.parseType()
+        
         if self.at().type == TokenType.SemiColon:
             self.eat()
             if isConstant:
                 raise Exception("Constant declarations cannot be empty.")
-            return VariableDeclarationStatement(isConstant, identifier, isConstant)
+            return VariableDeclarationStatement(isConstant, identifier, typee, isConstant)
+        
         self.expect(TokenType.Assign, "Expected assign token following identifier in var declaration.")
-        declaration = VariableDeclarationStatement(isConstant, identifier, self.parseExpression())
+        declaration = VariableDeclarationStatement(isConstant, identifier, typee, self.parseExpression())
         self.expect(TokenType.SemiColon, "Expected semicolon following var declaration.")
         return declaration
-
+    
     def parseFunctionDeclaration(self):
         self.eat()
         name = self.expect(TokenType.Identifier, "Expected identifier following function keyword.").value
@@ -111,6 +119,31 @@ class Parser:
         self.expect(TokenType.CloseBrace, "Expected close brace following function declaration.")
 
         return consequent
+
+    def parseType(self):
+        if self.at().type == TokenType.Number:
+            self.eat()
+            return NumberType()
+        
+        if self.at().type == TokenType.Boolean:
+            self.eat()
+            return BooleanType()
+        
+        if self.at().type == TokenType.OpenBrace:
+            self.eat()
+            properties = []
+            while self.at().type != TokenType.EOF and self.at().type != TokenType.CloseBrace:
+                print(self.at())
+                identifier = self.expect(TokenType.Identifier, "Expected identifier following open brace.").value
+                self.expect(TokenType.Colon, "Expected colon following identifier in object literal.")
+                typee = self.parseType()
+                properties.append(PropertyType(identifier, typee))
+                if self.at().type == TokenType.Comma:
+                    self.eat()
+            self.expect(TokenType.CloseBrace, "Expected close brace.")
+            return ObjectType(properties)
+        
+        raise Exception(f"Unidentified type provided at {self.at()}")
 
     def parseExpression(self):
         return self.parseAssignmentExpression()
@@ -290,6 +323,14 @@ class Parser:
             return ContinueStatement()
         elif token == TokenType.NumericLiteral:
             return NumericLiteralExpression(float(self.eat().value))
+        elif token == TokenType.TrueBooleanLiteral:
+            self.eat()
+            return BooleanLiteralExpression("true")
+        elif token == TokenType.FalseBooleanLiteral:
+            self.eat()
+            return BooleanLiteralExpression("false")
+        elif token == TokenType.StringLiteral:
+            return StringLiteralExpression(self.eat().value)
         elif token == TokenType.OpenParen:
             self.eat()
             value = self.parseExpression()

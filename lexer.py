@@ -5,46 +5,59 @@ from enum import Enum
 
 class TokenType(Enum):
     NumericLiteral = 1
-    Identifier = 2
-    Assign = 3
-    Equals = 4
-    NotEquals = 5
-    GreaterThan = 6
-    LessThan = 7
-    GreaterThanOrEquals = 8
-    LessThanOrEquals = 9
-    And = 10
-    Or = 11
-    Dot = 12
-    OpenParen = 13
-    CloseParen = 14
-    OpenBrace = 15
-    CloseBrace = 16
-    OpenBracket = 17
-    CloseBracket = 18
-    Colon = 19
-    SemiColon = 20
-    Comma = 21
-    BinaryOperator = 22
-    Let = 23
-    Const = 24
-    Fn = 25
-    If = 26
-    Else = 27
-    While = 28
-    Break = 29
-    Continue = 30
-    EOF = 31
+    TrueBooleanLiteral = 2
+    FalseBooleanLiteral = 3
+    StringLiteral = 4
+    Identifier = 5
+    Assign = 6
+    Equals = 7
+    NotEquals = 8
+    GreaterThan = 9
+    LessThan = 10
+    GreaterThanOrEquals = 11
+    LessThanOrEquals = 12
+    And = 13
+    Or = 14
+    Dot = 15
+    OpenParen = 16
+    CloseParen = 17
+    OpenBrace = 18
+    CloseBrace = 19
+    OpenBracket = 20
+    CloseBracket = 21
+    Colon = 22
+    SemiColon = 23
+    Comma = 24
+    SingleQuote = 25
+    DoubleQuote = 26
+    BinaryOperator = 27
+    Let = 28
+    Const = 29
+    Fn = 30
+    If = 31
+    Else = 32
+    While = 33
+    Break = 34
+    Continue = 35
+    Number = 36
+    Boolean = 37
+    String = 38
+    EOF = 39
 
 KEYWORDS = {
     "let": TokenType.Let,
     "const": TokenType.Const,
+    "true": TokenType.TrueBooleanLiteral,
+    "false": TokenType.FalseBooleanLiteral,
     "fn": TokenType.Fn,
     "if": TokenType.If,
     "else": TokenType.Else,
     "while": TokenType.While,
     "break": TokenType.Break,
     "continue": TokenType.Continue,
+    "number": TokenType.Number,
+    "boolean": TokenType.Boolean,
+    "string": TokenType.String
 }
 
 class Token:
@@ -144,6 +157,15 @@ def tokenize(sourceCode):
             src = src[1:]
         elif src[0] == ",":
             tokens.append(Token(src[0], TokenType.Comma))
+            src = src[1:]
+        elif src[0] == "'" or src[0] == '"':
+            quoted = src[0]
+            src = src[1:]
+            string = ""
+            while len(src) > 0 and src[0] != quoted:
+                string += src[0]
+                src = src[1:]
+            tokens.append(Token(string, TokenType.StringLiteral))
             src = src[1:]
         else:
             ## Multi character tokens

@@ -23,14 +23,15 @@ class Expression(Statement):
 
 class VariableDeclarationStatement(Statement):
     
-    def __init__(self, constant, identifier, value = None):
+    def __init__(self, constant, identifier, typee, value = None):
         self.kind = 'VariableDeclaration'
         self.constant = constant
         self.identifier = identifier
+        self.typee = typee
         self.value = value
 
     def __str__(self):
-        return "{ " + f'kind: "{self.kind}", constant: {self.constant}, identifier: {self.identifier}, value: {self.value}' + " }"
+        return "{ " + f'kind: "{self.kind}", constant: {self.constant}, identifier: {self.identifier}, typee: {self.typee}, value: {self.value}' + " }"
     
     def __repr__(self):
         return self.__str__()
@@ -153,6 +154,31 @@ class MemberExpression(Expression):
     def __repr__(self):
         return self.__str__()
 
+class ObjectLiteralExpression(Expression):
+    def __init__(self, properties):
+        self.kind = 'ObjectLiteral'
+        self.properties = properties
+    
+    def __str__(self):
+        return "{ " + f'kind: "{self.kind}", properties: {self.properties}' + " }"
+    
+    def __repr__(self):
+        return self.__str__()
+
+class PropertyExpression(Expression):
+
+    def __init__(self, key, value = None):
+        super().__init__()
+        self.kind = 'Property'
+        self.key = key
+        self.value = value
+    
+    def __str__(self):
+        return "{ " + f'kind: "{self.kind}", key: {self.key}, value: {self.value}' + " }"
+    
+    def __repr__(self):
+        return self.__str__()
+
 class IdentifierExpression(Expression):
     
     def __init__(self, symbol):
@@ -176,27 +202,24 @@ class NumericLiteralExpression(Expression):
     def __repr__(self):
         return self.__str__()
 
-class PropertyExpression(Expression):
-
-    def __init__(self, key, value = None):
-        super().__init__()
-        self.kind = 'Property'
-        self.key = key
+class BooleanLiteralExpression(Expression):
+    def __init__(self, value):
+        self.kind = 'BooleanLiteral'
         self.value = value
     
     def __str__(self):
-        return "{ " + f'kind: "{self.kind}", key: {self.key}, value: {self.value}' + " }"
+        return "{ " + f'kind: "{self.kind}", value: {self.value}' + " }"
     
     def __repr__(self):
         return self.__str__()
 
-class ObjectLiteralExpression(Expression):
-    def __init__(self, properties):
-        self.kind = 'ObjectLiteral'
-        self.properties = properties
+class StringLiteralExpression(Expression):
+    def __init__(self, value):
+        self.kind = 'StringLiteral'
+        self.value = value
     
     def __str__(self):
-        return "{ " + f'kind: "{self.kind}", properties: {self.properties}' + " }"
+        return "{ " + f'kind: "{self.kind}", value: "{self.value}"' + " }"
     
     def __repr__(self):
         return self.__str__()
