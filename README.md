@@ -57,7 +57,7 @@ Here are examples of binary operations:
 
 **String Addition:**
 ```
-> let x = "Hello";
+> let x: string = "Hello";
 { type: "string", value: "Hello" }
 > x = x + ", World!"
 { type: "string", value: "Hello, World!" }
@@ -67,19 +67,19 @@ Here are examples of binary operations:
 We can declare a variable and then reassign it
 **Declare Mutable Variable as a primitive and reassign:**
 ```
-> let x = 1;
+> let x: number = 1;
 { value: 1 }
 > x = 2
 { value: 2 }
 ```
 **Declare Constants:**
 ```
-> const x = 1;
+> const x: number = 1;
 { value: 1 }
 ```
 **Declare Mutable Variable as an object:**
 ```
-> let x = { a: 1, b: 2 };
+> let x: {a: number, b: number} = { a: 1, b: 2 };
 ```
 **Reassign member value:**
 ```
