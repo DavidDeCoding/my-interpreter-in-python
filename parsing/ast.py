@@ -38,14 +38,15 @@ class VariableDeclarationStatement(Statement):
 
 class FunctionDeclarationStatement(Statement):
 
-    def __init__(self, name, parameters, body):
+    def __init__(self, name, parameters, body, typee):
         self.kind = 'FunctionDeclaration'
         self.name = name
         self.parameters = parameters
         self.body = body
+        self.typee = typee
 
     def __str__(self):
-        return "{ " + f'kind: "{self.kind}", name: {self.name}, parameters: {self.parameters}, body: {self.body}' + " }"
+        return "{ " + f'kind: "{self.kind}", name: {self.name}, parameters: {self.parameters}, body: {self.body}, typee: {self.typee}' + " }"
     
     def __repr__(self):
         return self.__str__()

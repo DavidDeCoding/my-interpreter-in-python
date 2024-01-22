@@ -1,4 +1,4 @@
-from values import BooleanValue, NullValue, NumericValue, NativeFnValue
+from evaluation.values import BooleanValue, NullValue, NumericValue, NativeFnValue
 import time
 
 class Environment:

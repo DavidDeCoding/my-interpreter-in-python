@@ -1,6 +1,5 @@
-from values import NullValue, NumericValue, StringValue, ObjectValue, NativeFnValue, FunctionValue
-from ast import Statement
-from environment import Environment
+from evaluation.values import NullValue, NumericValue, StringValue, ObjectValue, NativeFnValue, FunctionValue
+from evaluation.environment import Environment
 
 ##################################
 # --------------------------------

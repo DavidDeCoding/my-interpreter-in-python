@@ -1,6 +1,6 @@
-from ast import Statement, ProgramStatement, VariableDeclarationStatement, FunctionDeclarationStatement, IfStatement, WhileStatement, BreakStatement, ContinueStatement, AssignmentExpressionStatement, Expression, ObjectLiteralExpression, PropertyExpression, BinaryExpression, CallExpression, MemberExpression, NumericLiteralExpression, BooleanLiteralExpression, StringLiteralExpression, IdentifierExpression
-from lexer import tokenize, Token, TokenType
-from typed import NumberType, BooleanType, ObjectType, PropertyType
+from parsing.ast import Statement, ProgramStatement, VariableDeclarationStatement, FunctionDeclarationStatement, IfStatement, WhileStatement, BreakStatement, ContinueStatement, AssignmentExpressionStatement, Expression, ObjectLiteralExpression, PropertyExpression, BinaryExpression, CallExpression, MemberExpression, NumericLiteralExpression, BooleanLiteralExpression, StringLiteralExpression, IdentifierExpression
+from lexing.lexer import tokenize, Token, TokenType
+from typed.values import NumberType, BooleanType, StringType, ObjectType, PropertyType, FunctionType
 
 class Parser:
 
@@ -69,18 +69,46 @@ class Parser:
         self.eat()
         name = self.expect(TokenType.Identifier, "Expected identifier following function keyword.").value
         
-        args = self.parseArgs()
+        args = self.parseFunctionDeclarationArgs()
         parameters = []
+        parameters_types = []
         for arg in args:
-            if arg.kind == "Identifier":
-                parameters.append(IdentifierExpression(arg.symbol))
+            (arg_arg, arg_type) = arg
+            if arg_arg.kind == "Identifier":
+                parameters.append(IdentifierExpression(arg_arg.symbol))
             else:
-                print(arg)
+                print(arg_arg)
                 raise Exception("Expected identifier following function keyword.")
+            parameters_types.append(arg_type)
+
+        self.expect(TokenType.Colon, "Function requires return type")
+        ret = self.parseType()
+        typee = FunctionType(parameters_types, ret)
 
         body = self.parseBody()
 
-        return FunctionDeclarationStatement(name, parameters, body)
+        return FunctionDeclarationStatement(name, parameters, body, typee)
+
+    def parseFunctionDeclarationArgs(self):
+        self.expect(TokenType.OpenParen, "Expected open parenthesis following function call.")
+        args = [] if self.at().type == TokenType.CloseParen else self.parseFunctionDeclarationArgsList()
+
+        self.expect(TokenType.CloseParen, "Expected closing parenthesis following function call.")
+        return args
+    
+    def parseFunctionDeclarationArgsList(self):
+        symbol = self.parseAssignmentExpression()
+        self.expect(TokenType.Colon, "Expected colon following argument.")
+        typee = self.parseType()
+        args = [(symbol, typee)]
+
+        while self.at().type == TokenType.Comma and self.eat():
+            symbol = self.parseAssignmentExpression()
+            self.expect(TokenType.Colon, "Expected colon following argument.")
+            typee = self.parseType()
+            args.append((symbol, typee))
+        
+        return args
 
     def parseIf(self):
         self.eat()
@@ -128,6 +156,10 @@ class Parser:
         if self.at().type == TokenType.Boolean:
             self.eat()
             return BooleanType()
+        
+        if self.at().type == TokenType.String:
+            self.eat()
+            return StringType()
         
         if self.at().type == TokenType.OpenBrace:
             self.eat()
