@@ -165,7 +165,6 @@ class Parser:
             self.eat()
             properties = []
             while self.at().type != TokenType.EOF and self.at().type != TokenType.CloseBrace:
-                print(self.at())
                 identifier = self.expect(TokenType.Identifier, "Expected identifier following open brace.").value
                 self.expect(TokenType.Colon, "Expected colon following identifier in object literal.")
                 typee = self.parseType()

@@ -11,12 +11,15 @@ def isSubtype(typeeA, typeeB):
     if typeeA.type == "String" and typeeB.type == "String":
         return True
     if typeeA.type == "Object" and typeeB.type == "Object":
-        for prop in typeeA.properties:
-            if prop.name not in typeeB.properties:
-                return False
-            if not TypeChecker.isSubtype(prop.typee, b.properties[prop.name]):
-                return False
-        return True
+        foundProperties = set()
+
+        for propA in typeeA.properties:
+            for propB in typeeB.properties:
+                if propA.name == propB.name and not isSubtype(propA.typee, propB.typee):
+                    return False
+                foundProperties.add(propA.name)
+
+        return len(foundProperties) == len(typeeA.properties)
 
 ##################################
 # --------------------------------
@@ -42,7 +45,7 @@ def validateWhile(whileAstNode, environment):
 def validateVariableDeclaration(variableDeclarationAstNode, environment):
     synthType = validateExpression(variableDeclarationAstNode.value, environment)
     if variableDeclarationAstNode.typee is not None:
-        if not TypeChecker.isSubtype(synthType, variableDeclarationAstNode.typee):
+        if not isSubtype(synthType, variableDeclarationAstNode.typee):
             raise Exception(f"Cannot assign {synthType} to {variableDeclarationAstNode.typee}")
 
     return environment.declareVariable(variableDeclarationAstNode.identifier, synthType)
